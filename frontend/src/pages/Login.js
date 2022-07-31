@@ -1,37 +1,57 @@
-import React , { useState , useEffect } from 'react'
+import React , { useState } from 'react'
+import { GoogleLogin } from '@react-oauth/google';
 import { MDBCard , MDBCardBody , MDBInput , MDBCardFooter , MDBValidation , MDBBtn , MDBIcon , MDBSpinner } from "mdb-react-ui-kit"
 import { Link , useNavigate } from "react-router-dom"
-import { useDispatch , useSelector } from 'react-redux'
-import { toast } from "react-toastify"
-import { SignIn } from '../redux/api'
-
+import { useDispatch, useSelector } from 'react-redux'
+import { SignIn , GoogleSignIn} from '../redux/api'
+import { toast } from 'react-toastify';
 
 const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  
+  // gets the loading status 
+  const { loading , user , error } = useSelector((state)=>{
+    return state.auth
+  })
+
+  console.log(user);
+
+  // forms values
   const [ formValue , setFormValue ] = useState({
     email : "",
     password : ""
   });
 
-
   // handles form submit
   const handleSubmit = async (e) => {
       e.preventDefault();
       if(formValue.email && formValue.password) {
+
+        // takes form value, validates and nav to homepage
          SignIn(formValue , dispatch , navigate)    
       }
   }
 
 
-  // handles form input change
+  // handles form input 
   const onInputChange = (e) => {
     let { name , value } = e.target
     setFormValue({ ...formValue ,
       [name] : value
     })
+  }
+
+
+  // handles google success 
+  const credentialResponse = async (resp) => {
+      GoogleSignIn( resp , dispatch , navigate )
+      // console.log(resp)
+  }
+
+  // handles google error
+  const googleFailure = (error) => {
+    toast.error("Something went wrong")
   }
 
   return (
@@ -77,10 +97,25 @@ const Login = () => {
                 <MDBBtn
                   style={{ width: "100%" }}
                   className="mt-2"
-                > Login
+                > 
+                { loading && (
+                  <MDBSpinner
+                    size="sm"
+                    role="status"
+                    tag="span"
+                    className='me-2'
+                  />
+                )}
+                Login
                 </MDBBtn >                  
               </div>
           </MDBValidation>
+          <br/>
+          
+          <GoogleLogin  
+            onSuccess={credentialResponse}
+            onError={googleFailure}          
+          />
         </MDBCardBody>
         <MDBCardFooter>
           <Link to="/register">

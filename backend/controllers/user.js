@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken"
+import jwt_decode from 'jwt-decode'
 import userModel from "../models/user.js"
 
 const secret = "test"
@@ -20,8 +21,8 @@ export const signIn = async (req, res) =>{
             }
 
             const token = jwt.sign({email : oldUser.email , id : oldUser._id } , secret , { expiresIn : "1hr"}) 
-            res.status(200).json({ result : oldUser , token})
-
+            res.cookie("access_token" , token , { httpOnly : true } ).status(200).send({ result : oldUser })
+                        
     } catch (error) {
         res.status(500).json({ message : "Something went wrong"})
         console.log(err)        
@@ -51,5 +52,37 @@ export const signUp = async (req , res) =>{
     }   catch (err) {
         res.status(500).json({ message : "Something went wrong"})
         console.log(err)
+    }
+}
+
+
+export const googleSignIn = async ( req , res , next) => {
+    const token = req.body.credential
+    
+    try {
+        let decoded = jwt_decode(token)
+        const { email , name , sub } = decoded
+
+        // checks if email already exists
+        const oldUser = await userModel.findOne({ email })
+
+        // 
+        if(oldUser) {
+            const result = { _id : oldUser._id.toString() , email , name }
+            return res.status(201).json({ result , token })
+        }
+
+        // create new user if gmail cant be found
+        const result = await userModel.create({
+            email,
+            name,
+            googleId : sub
+        })
+
+        res.status(201).json({result , token})
+
+     } catch (error) {
+        res.status(500).json({ message : "Something went wrong"})
+        console.log(error)
     }
 }
