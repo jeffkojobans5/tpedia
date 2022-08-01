@@ -1,4 +1,4 @@
-import React , { useState } from 'react'
+import { useState } from 'react'
 import { GoogleLogin } from '@react-oauth/google';
 import { MDBCard , MDBCardBody , MDBInput , MDBCardFooter , MDBValidation , MDBBtn , MDBIcon , MDBSpinner } from "mdb-react-ui-kit"
 import { Link , useNavigate } from "react-router-dom"
@@ -11,11 +11,10 @@ const Login = () => {
   const navigate = useNavigate();
 
   // gets the loading status 
-  const { loading , user , error } = useSelector((state)=>{
+  const { loading } = useSelector((state)=>{
     return state.auth
   })
 
-  console.log(user);
 
   // forms values
   const [ formValue , setFormValue ] = useState({
@@ -53,6 +52,7 @@ const Login = () => {
   const googleFailure = (error) => {
     toast.error("Something went wrong")
   }
+
 
   return (
     <div

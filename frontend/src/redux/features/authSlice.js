@@ -9,6 +9,13 @@ const authSlice = createSlice({
         loading : false
     },
     reducers: {
+        set_user : (state , action ) => {
+            state.user = action.payload
+        },
+        logout_success : (state) => {
+            state.user = null;
+            localStorage.clear()
+        },
         signin_begin : (state) => {
             state.loading = true
             state.error = false
@@ -42,7 +49,7 @@ const authSlice = createSlice({
         google_success : (state , action ) => {
             state.loading = false
             state.user = action.payload
-            localStorage.setItem("profile" , JSON.stringify(action.payload))
+            localStorage.setItem("profile" , JSON.stringify(action.payload))            
         },
         google_error : (state) => {
             state.loading = false
@@ -54,6 +61,10 @@ const authSlice = createSlice({
 
 export default authSlice.reducer
 export const { 
+    set_user,
+    logout_begin,
+    logout_success,
+    logout_error,
     signin_begin , 
     signin_success , 
     signin_error , 

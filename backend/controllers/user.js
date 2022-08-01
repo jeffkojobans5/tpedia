@@ -47,8 +47,8 @@ export const signUp = async (req , res) =>{
             name: `${firstName} ${lastName}`
         })
 
-        const token = jwt.sign({ email: result.email , id: result._id} , secret , { expiresIn : "1hr"} )
-        res.status(201).json({ result , token})
+        const token = jwt.sign({email : result.email , id : result._id } , secret , { expiresIn : "1hr"}) 
+        res.cookie("access_token" , token , { httpOnly : true } ).status(200).send({ result : result })
     }   catch (err) {
         res.status(500).json({ message : "Something went wrong"})
         console.log(err)
@@ -69,20 +69,36 @@ export const googleSignIn = async ( req , res , next) => {
         // 
         if(oldUser) {
             const result = { _id : oldUser._id.toString() , email , name }
-            return res.status(201).json({ result , token })
+            const tokenL = jwt.sign({email : oldUser.email , id : oldUser._id } , secret , { expiresIn : "1hr"}) 
+            return res.cookie("access_token" , tokenL , { httpOnly : true } ).status(200).send({ result : result })            
         }
 
         // create new user if gmail cant be found
-        const result = await userModel.create({
-            email,
-            name,
-            googleId : sub
-        })
-
-        res.status(201).json({result , token})
+            const result = await userModel.create({
+                email,
+                name,
+                googleId : sub
+            })
+    
+            const results = { _id : result._id.toString() , email , name }
+            const tokenL = jwt.sign({email : oldUser.email , id : oldUser._id } , secret , { expiresIn : "1hr"}) 
+            return res.cookie("access_token" , tokenL , { httpOnly : true } ).status(200).send({ result : results })  
+        
 
      } catch (error) {
         res.status(500).json({ message : "Something went wrong"})
         console.log(error)
     }
+}
+
+
+export const logout = async (req, res) => {
+    // Set token to none and expire after 5 seconds
+    res.cookie('access_token', 'none', {
+        expires: new Date(Date.now() + 5 * 1000),
+        httpOnly: true,
+    })
+    res
+        .status(200)
+        .json({ success: true, message: 'User logged out successfully' })
 }

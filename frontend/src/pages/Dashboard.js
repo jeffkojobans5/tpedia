@@ -2,22 +2,22 @@ import { useEffect } from 'react'
 import { MDBCol , MDBContainer , MBDRow , MDBTypography, MDBRow } from "mdb-react-ui-kit"
 import { useDispatch , useSelector } from "react-redux"
 import { useNavigate} from "react-router-dom"
-import { allTours } from '../redux/api'
+import { getToursByUser } from '../redux/api'
 import CardTour from '../components/CardTour'
 
 
-const Home = () => {
+const Dashboard = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
 
-  const tours = useSelector((state) => state.tour.all_tours)
-  console.log('tours' , tours)
+//   const tours = useSelector((state) => state.tour.all_tours)
+//   console.log('tours' , tours)
 
   useEffect(()=> {
-    allTours(dispatch)
+    getToursByUser(dispatch)
   },[])
 
-  return (
+  return (  
     <div style={{
       margin: "auto",
       padding: "15px",
@@ -26,7 +26,7 @@ const Home = () => {
       alignContent: "center",
       backgroundColor : "brown"
     }}>
-      <MDBRow className=''>
+      {/* <MDBRow className=''>
         { tours.length == 0 && (
           <MDBTypography className='text-center mb-0' tag='h2'>
             No Tours
@@ -44,10 +44,10 @@ const Home = () => {
             </MDBRow>
           </MDBContainer>
         </MDBCol>
-      </MDBRow>
+      </MDBRow> */}
 
     </div>
   )
 }
 
-export default Home
+export default Dashboard

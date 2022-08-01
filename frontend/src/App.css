@@ -7,6 +7,15 @@
   pointer-events: none;
 }
 
+.links-bar {
+  display: flex
+}
+
+.links-bar a {
+  flex: 1;
+  color: brown;
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
     animation: App-logo-spin infinite 20s linear;
